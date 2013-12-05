@@ -14,6 +14,8 @@ TODO:
  * Add a default case to each location
  * QTE fix, it doesn't work or the player doesn't know when it works
  * Get the countdown to work
+ 
+ *TODO FOR EVERYONE:
  * Get a timesheet ( ie "I did this" ) from each member to hand in with assignment
 
 TODO AFTER GAME IS DONE:
