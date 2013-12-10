@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextBasedAdventureGame", "TextBasedAdventureGame\TextBasedAdventureGame.csproj", "{D61E83FA-1CE8-4A8A-9F5F-A61AA75E359B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory", "..\Inventory\Inventory\Inventory.csproj", "{A73920AC-3440-4BC6-B238-A69B035DB3E0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory", "Inventory\Inventory.csproj", "{A73920AC-3440-4BC6-B238-A69B035DB3E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

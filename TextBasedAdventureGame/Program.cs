@@ -12,11 +12,6 @@ TODO:
  * Replace all lower case cases with upper case
  * Add a check inventory and look around case to each location
  * Add a default case to each location
- * QTE fix, it doesn't work or the player doesn't know when it works
- * Get the countdown to work
- 
- *TODO FOR EVERYONE:
- * Get a timesheet ( ie "I did this" ) from each member to hand in with assignment
 
 TODO AFTER GAME IS DONE:
  * Add comments for Tony showing examples of what he's looking for ( ie the requirements for the assignment )
@@ -30,24 +25,21 @@ namespace TextBasedAdventureGame
         static void Main(string[] args)
         {
             Game theGame = new Game();
-            theGame.reset();            
+            theGame.reset();
 
             //theGame.StartGame();
 
             while (theGame.getPlaying() == true)
             {
-                theGame.checkIfValid(Console.ReadLine().ToUpper());   
+                theGame.checkIfValid(Console.ReadLine().ToUpper());
             }
         }
     }
-
-    public delegate bool QTE(int input);
 
     public class Game
     {
         bool m_Playing = true;
         Location m_Location = new Location();
-        Map.Map map = new Map.Map();
 
         string currentLocation = string.Empty;
 
@@ -154,6 +146,9 @@ namespace TextBasedAdventureGame
         bool lookedAround = false;
         bool pissedSelf = false;
         bool checkedBasement = false;
+        delegate double GetTimeDelegate();
+
+        public delegate bool QTE(int input);
 
         public void reset()
         {
@@ -357,7 +352,7 @@ namespace TextBasedAdventureGame
             Console.Clear();
             Console.WriteLine("You approach the river with caution as the rapids could easily pull you");
             Console.WriteLine(" in and make short work of you. A ROPE could be quite handy right now...\n");
-           
+
 
             while (getLocation() == "RIVER")
             {
@@ -404,7 +399,7 @@ namespace TextBasedAdventureGame
                 Console.WriteLine("Search Rocks");
                 Console.WriteLine("Take PICKAXE");
                 Console.WriteLine("Leave");
-                
+
                 switch (Console.ReadLine().ToUpper())
                 {
                     case "TALK TO WORKERS":
@@ -590,21 +585,23 @@ namespace TextBasedAdventureGame
             int posXForestMaze = 0;
             int posYForestMaze = 0;
             Countdown temp = new Countdown();
+            GetTimeDelegate getTimeDelegate = new GetTimeDelegate(temp.getTime);
 
             DateTime StartTime = DateTime.Now;
-            Thread forest = new Thread(ForestMaze);
-            Timer timer = new Timer(temp.Times_up, forest, 120000, Timeout.Infinite);
-            forest.Start(StartTime);
-            forest.Join();
-            timer.Dispose();
-
-            //CountdownEvent countDown = new CountdownEvent(10);
-
-            //CountdownTimer timerCountdown = new CountdownTimer(10000);
 
             while (getLocation() == "FOREST_MAZE")
             {
-                
+                temp.Show_Left(StartTime);
+
+                if (getTimeDelegate() <= 0)
+                {
+                    Console.Clear();
+                    Console.WriteLine("You get lost in the forest, and starve to death slowly over the next several days.");
+                    Thread.Sleep(3000);
+                    setLocation(string.Empty);
+                    gameOver();
+                }
+
                 Console.Clear();
                 temp.Show_Left(StartTime);
                 Console.WriteLine("Everything looks the same. Any direction seems as good as the last. Which way would you like to go?");
@@ -679,6 +676,12 @@ namespace TextBasedAdventureGame
                         inventory.printInventory();
                         break;
 
+                    case "FOREST":
+                    case "MAZE":
+                    case "WEST":
+                        ForestMaze();
+                        break;
+
                     default:
                         Console.WriteLine("Thy does not compute. Try again");
                         break;
@@ -689,7 +692,7 @@ namespace TextBasedAdventureGame
         private void Basement()
         {
             setLocation("BASEMENT");
-            
+
             Console.Clear();
             Console.WriteLine("You open the door and head down the old rickety stairs to the BASEMENT.");
             Console.WriteLine("The further down you go the less you can see until nothing is visible.");
@@ -739,7 +742,7 @@ namespace TextBasedAdventureGame
                         Tavern();
                         break;
 
-                    case "GO TO THE CASTLE":               
+                    case "GO TO THE CASTLE":
                     case "CASTLE":
                         Castle();
                         break;
@@ -751,7 +754,7 @@ namespace TextBasedAdventureGame
                     case "CHECK INVENTORY":
                         Console.Clear();
                         inventory.printInventory();
-                        break;                        
+                        break;
 
                     default:
                         {
@@ -820,7 +823,7 @@ namespace TextBasedAdventureGame
                             }
                             break;
                         }
-       
+
                     //You find a gem. Its pretty
                     case "LOOK AROUND":
                     case "LOOK":
@@ -829,7 +832,7 @@ namespace TextBasedAdventureGame
                             {
                                 Console.WriteLine("You find nothing of interest");
                                 Console.Clear();
-                                    break;
+                                break;
                             }
                             else
                             {
@@ -848,7 +851,7 @@ namespace TextBasedAdventureGame
                             break;
                         }
 
-                        //Got the gem? If you didnt talk to the blacksmith after finding it, he kills you. Otherwise you're fine
+                    //Got the gem? If you didnt talk to the blacksmith after finding it, he kills you. Otherwise you're fine
                     case "GO TO THE TOWN":
                     //Got the gem? If you didnt talk to the blacksmith after finding it, he kills you. Otherwise you're fine
                     case "TOWN":
@@ -961,80 +964,81 @@ namespace TextBasedAdventureGame
             string input = Console.ReadLine();
 
             QTEClass myQTE = new QTEClass();
-
             QTE event1 = new QTE(myQTE.event1);
 
             for (int i = 0; i < 100000000; i++)
             {
-                Console.WriteLine("Wat");
-                Console.Clear();
-                Console.WriteLine("       ,--.--._");
-                Console.WriteLine("------'' _, \\___)");
-                Console.WriteLine("        / _/____)");
-                Console.WriteLine("        \\//(____)");
-                Console.WriteLine("------\\     (__)");
-                Console.WriteLine("       `-----''");
-
-                System.Threading.Thread.Sleep(200);
-                Console.Clear();
-                Console.WriteLine("         ,--.--._");
-                Console.WriteLine("--------'' _, \\___)");
-                Console.WriteLine("          / _/____)");
-                Console.WriteLine("          \\//(____)");
-                Console.WriteLine("--------\\     (__)");
-                Console.WriteLine("         `-----''");
-
-                System.Threading.Thread.Sleep(200);
-                Console.Clear();
-                Console.WriteLine("             ,--.--._");
-                Console.WriteLine("-----------'' _, \\___)");
-                Console.WriteLine("             / _/____)");
-                Console.WriteLine("             \\//(____)");
-                Console.WriteLine("-----------\\     (__)");
-                Console.WriteLine("            `-----''");
-
-                System.Threading.Thread.Sleep(200);
-                Console.Clear();
-                Console.WriteLine("               ,--.--._");
-                Console.WriteLine("-------------'' _, \\___)");
-                Console.WriteLine("               / _/____)");
-                Console.WriteLine("               \\//(____)");
-                Console.WriteLine("-------------\\     (__)");
-                Console.WriteLine("               `-----''");
-
-                System.Threading.Thread.Sleep(200);
-                Console.Clear();
-                Console.WriteLine("                  ,--.--._");
-                Console.WriteLine("----------------'' _, \\___)");
-                Console.WriteLine("                  / _/____)");
-                Console.WriteLine("                  \\//(____)");
-                Console.WriteLine("----------------\\     (__)");
-                Console.WriteLine("               `-----''");
-
-                System.Threading.Thread.Sleep(200);
-                Console.Clear();
-                Console.WriteLine("                     ,--.--._");
-                Console.WriteLine("-------------------'' _, \\___)");
-                Console.WriteLine("                     / _/____)");
-                Console.WriteLine("                     \\//(____)");
-                Console.WriteLine("-------------------\\     (__)");
-                Console.WriteLine("                  `-----''");
-                ConsoleKeyInfo checker;
-                checker = Console.ReadKey(true);
-                if (checker.Key == ConsoleKey.Q )
+                do
                 {
-                    //You win/game over shit
-                    return;
-                }
-                
-                if (i == 99999999)
-                {
-                   gameOver();
-                    break;
-                }
+                    while (!Console.KeyAvailable)
+                    {
+
+                        Console.WriteLine("Wat");
+                        Console.Clear();
+                        Console.WriteLine("       ,--.--._");
+                        Console.WriteLine("------'' _, \\___)");
+                        Console.WriteLine("        / _/____)");
+                        Console.WriteLine("        \\//(____)");
+                        Console.WriteLine("------\\     (__)");
+                        Console.WriteLine("       `-----''");
+
+                        System.Threading.Thread.Sleep(200);
+                        Console.Clear();
+                        Console.WriteLine("         ,--.--._");
+                        Console.WriteLine("--------'' _, \\___)");
+                        Console.WriteLine("          / _/____)");
+                        Console.WriteLine("          \\//(____)");
+                        Console.WriteLine("--------\\     (__)");
+                        Console.WriteLine("         `-----''");
+
+                        System.Threading.Thread.Sleep(200);
+                        Console.Clear();
+                        Console.WriteLine("             ,--.--._");
+                        Console.WriteLine("-----------'' _, \\___)");
+                        Console.WriteLine("             / _/____)");
+                        Console.WriteLine("             \\//(____)");
+                        Console.WriteLine("-----------\\     (__)");
+                        Console.WriteLine("            `-----''");
+
+                        System.Threading.Thread.Sleep(200);
+                        Console.Clear();
+                        Console.WriteLine("               ,--.--._");
+                        Console.WriteLine("-------------'' _, \\___)");
+                        Console.WriteLine("               / _/____)");
+                        Console.WriteLine("               \\//(____)");
+                        Console.WriteLine("-------------\\     (__)");
+                        Console.WriteLine("               `-----''");
+
+                        System.Threading.Thread.Sleep(200);
+                        Console.Clear();
+                        Console.WriteLine("                  ,--.--._");
+                        Console.WriteLine("----------------'' _, \\___)");
+                        Console.WriteLine("                  / _/____)");
+                        Console.WriteLine("                  \\//(____)");
+                        Console.WriteLine("----------------\\     (__)");
+                        Console.WriteLine("               `-----''");
+
+                        System.Threading.Thread.Sleep(200);
+                        Console.Clear();
+                        Console.WriteLine("                     ,--.--._");
+                        Console.WriteLine("-------------------'' _, \\___)");
+                        Console.WriteLine("                     / _/____)");
+                        Console.WriteLine("                     \\//(____)");
+                        Console.WriteLine("-------------------\\     (__)");
+                        Console.WriteLine("                  `-----''");
+
+                        if (i == 99999999)
+                        {
+                            gameOver();
+                            break;
+                        }
+                    }
+                } while (Console.ReadKey(true).Key != ConsoleKey.Q);
+
+                break;
             }
 
-   
+            gameWin();
         }
 
         private void gameWin()
@@ -1047,11 +1051,10 @@ namespace TextBasedAdventureGame
             Console.WriteLine("( \\   / )| (   ) || )   ( |  | )   ( |   ) (   |  \\  ( |");
             Console.WriteLine(" \\ (_) / | |   | || |   | |  | | _ | |   | |   |   \\ | |");
             Console.WriteLine("  \\   /  | |   | || |   | |  | |( )| |   | |   | (\\ \\) |");
-            Console.WriteLine("   ) (    | |   | || |   | |  | || || |   | |   | | \\   |");
-            Console.WriteLine("   | |    | (___) || (___) |  | () () |___) (___| )  \\  |");
+            Console.WriteLine("   ) (   | |   | || |   | |  | || || |   | |   | | \\   |");
+            Console.WriteLine("   | |   | (___) || (___) |  | () () |___) (___| )  \\  |");
             Console.WriteLine("   \\_/   (_______)(_______)  (_______)\\_______/|/    )_)");
 
-            Console.WriteLine("Press any key to continue");
             System.Threading.Thread.Sleep(3000);
 
             bool winScreen = true;
@@ -1101,7 +1104,7 @@ namespace TextBasedAdventureGame
             System.Threading.Thread.Sleep(3000);
 
             bool gameOverScreen = true;
-            
+
             while (gameOverScreen)
             {
                 Console.WriteLine("Press any key to continue");
@@ -1111,24 +1114,32 @@ namespace TextBasedAdventureGame
 
             Console.Clear();
             reset();
+            Town();
         }
     }
 
     public class Countdown
     {
+        TimeSpan m_Left;
+
         public void Show_Left(DateTime dt)
         {
-            TimeSpan duration = new TimeSpan(0, 0, 10);
+            TimeSpan duration = new TimeSpan(0, 0, 30);
             TimeSpan ts = DateTime.Now - dt;
-            TimeSpan left = duration - ts;
-            Console.WriteLine("[{0:00}:{1:00}:{2:00}]", left.Hours, left.Minutes, left.Seconds);
+            m_Left = duration - ts;
+            Console.WriteLine("[{0:00}:{1:00}:{2:00}]", m_Left.Hours, m_Left.Minutes, m_Left.Seconds);
         }
 
         public void Times_up(object thread)
         {
             Thread t = (Thread)thread;
             Console.WriteLine("\nTime's Up!");
-            //t.Abort();
+            t.Abort();
+        }
+
+        public double getTime()
+        {
+            return m_Left.TotalMilliseconds;
         }
     }
 
@@ -1173,56 +1184,5 @@ namespace TextBasedAdventureGame
         }
 
     }
-
-    //public partial class CountdownTimer
-    //{
-    //    Counter count = new Counter();
-    //    Counter timer = new Counter();
-    //    DateTime MainTimer_last_Tick = DateTime.Now;
-    //    int startTime = -1;
-
-    //    public CountdownTimer(/*int timeInMilliseconds*/)
-    //    {
-    //        //l_Timer_TE.Text = (int.Parse(tb_TimerLength_TE.Text)*1000).ToString();
-    //        //timer.aTimer.Interval = timeInMilliseconds * 1000;
-    //        //timer.aTimer.Enabled = true;
-    //        //timer.aTimer.Tick += new EventHandler(TimerDone);
-
-    //        //count.aTimer.Interval = 1000;
-    //        //count.aTimer.Enabled = true;
-    //        //count.aTimer.Tick += new EventHandler(TimerTick);
-    //        //count.aTimer.Start();
-    //        //timer.aTimer.Start();
-    //        //MainTimer_last_Tick = DateTime.Now;
-    //    }
-
-    //    public void TimerDone(object source, EventArgs e)
-    //    {
-    //        timer.aTimer.Stop();
-    //        count.aTimer.Stop();
-    //        Console.WriteLine("Your timer is up");
-    //    }
-
-    //    public void TimerTick(object source, EventArgs e)
-    //    {
-    //        TimerUpdate();
-    //    }
-
-    //    public void TimerUpdate()
-    //    {
-    //        double remaining_Milliseconds = (int)(MainTimer_last_Tick.AddMilliseconds(timer.aTimer.Interval).Subtract(DateTime.Now).TotalMilliseconds);
-    //        Console.WriteLine(Math.Round(remaining_Milliseconds / 1000, 0, MidpointRounding.AwayFromZero).ToString());
-    //    }
-    //}
-
-    //public class Counter
-    //{
-    //    public System.Windows.Forms.Timer aTimer = null;
-
-    //    public Counter()
-    //    {
-    //        aTimer = new System.Windows.Forms.Timer();
-    //    }
-    //}
 }
 
